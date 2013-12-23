@@ -1,0 +1,117 @@
+\documentclass{beamer}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\title{An introduction to R}
+\author{Scott Powers and Ryan Wang}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]{The most important command}
+\begin{itemize}
+  \item R is a very well-documented language
+  \item The most important function is help, as it allows you to access that documentation
+  \item It can be accessed by help(function) or ?function for short e.g. type ?help to learn more about the help function
+  \item Google is also a great resource and usually links to either \href{http://stackoverflow.com/questions/tagged/r}{stackoverflow} or \href{http://www.r-project.org/mail.html}{the R mailing list}
+\end{itemize}
+\end{frame}
+
+%%
+%% A TASTE OF DATA
+%%
+
+\begin{frame}[fragile]{Data frames}
+\begin{block}{Let's start by reading in some real-life data}
+<<>>=
+  nba <- read.csv('nba_box_2012to2013.csv')
+  class(nba)
+@
+\end{block}
+In R terminology, data typically comes in the form of a \textit{data.frame} (try ?data.frame). They share many properties with matrices but can also include non-numeric values.
+\end{frame}
+
+\begin{frame}[fragile]{Data frames cont.}
+\begin{block}{This is very similar to what you'd see if you opened the .csv file in MS Excel}
+<<>>==
+  nba[1:5,1:5]
+@
+\end{block}
+Columns correspond to \textit{variables} e.g. column 5 indicates the number of minutes played. Rows correspond to \textit{observations} e.g. row 1 corresponds to Trevor Booker's line on the box score.
+\end{frame}
+
+\begin{frame}[fragile]{Data frames cont.}
+\begin{block}{This data frame contains 31,375 rows (observations) and 18 columns (variables)}
+<<>>==
+nrow(nba)
+ncol(nba)
+dim(nba)
+@
+\end{block}
+\end{frame}
+
+%%
+%% FUNDAMENTAL VECTOR CONCEPTS
+%%
+
+\begin{frame}[fragile]{Vectors}
+\begin{block}{The fundamental unit of computation in R is the vector. Create a vector by combining values with the "c" function (see ?vector and ?c):}
+<<>>==
+  v1 <- c(1,2,3,4,5)
+  v2 <- c('a','b','c','d')
+  v1
+  v2
+  is.vector(v1)
+@
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Vectors cont.}
+\begin{block}{Most functions involving vectors (as well as matrices) operate element-wise:}
+<<>>==
+  v1 + 3
+  v1 + v1 
+  sqrt(v1)
+@
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Vectors cont.}
+\begin{block}{The ":" operator (see ?colon) creates sequences}
+<<>>==
+1:5
+@
+\end{block}
+\begin{block}{The "runif" function (see ?runif) generates random numbers}
+<<>>==
+runif(5)
+runif(5, min=1, max=5)
+@
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Vectors cont.}
+\begin{block}{Boolean values (TRUE and FALSE) are very useful (we'll soon see an application)}
+<<>>==
+TRUE & FALSE
+!(!T & F)
+@
+\end{block}
+\begin{block}{Can also do vector operations}
+<<>>==
+1:5 > 2
+@
+\end{block}
+\end{frame}
+
+%%
+%% BACK TO THE DATA
+%%
+ 
+\end{document}
