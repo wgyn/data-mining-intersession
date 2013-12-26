@@ -1,0 +1,20 @@
+1. basketball analytics
+	- have data on box scores, play by play, and shot locations
+	- answer questions such as those posed by Jason Rosenfeld:
+	- What do you think is more valuable, an offensive rebound or a defensive rebound?  Holding everything else constant between two players, if one was the better defensive rebounder, and the other was the better offensive rebounder (by the same amount), who would you pick?
+	- How much does an increase in team 2FG% from 47% to 48% affect the # of games the team should expect to win on the year?  Your response can certainly include math, but regardless of math or no math, please include your thought process.
+
+2. real estate
+	- have data on home sale prices and home characteristics
+	- determine which characteristics are most/least valuable
+	- create a model to predict value of homes
+
+3. art auctions
+	- have data on art auction prices and art characteristics
+	- do something similar to above
+
+4. baseball analytics
+
+5. titanic survival (from Kaggle)
+	- have data on survival (binary) and person characteristics (e.g. sex, age, family, ticket fare)
+	- create a model to predict survival
