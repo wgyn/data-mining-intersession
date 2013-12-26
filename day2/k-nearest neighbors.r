@@ -1,0 +1,10 @@
+# Code used to generate data for k-Nearest Neighbor worksheet
+set.seed(22)
+x = c(rnorm(10), rnorm(10) + 1)
+y = c(rnorm(10) + 1, rnorm(10))
+x = ceiling((x - min(x))/diff(range(x))*9)
+y = ceiling((y - min(y))/diff(range(y))*9)
+color = rep(c('red', 'blue'), each = 10)
+plot(x, y, type = 'n', main = 'Simulated data set')
+text(x, y, col = color, label = 1:20)
+text(c(6, 3, 8), c(4, 7, 8), label = 21:23)
