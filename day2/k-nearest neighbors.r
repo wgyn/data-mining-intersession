@@ -1,4 +1,4 @@
-# Code used to generate data for k-Nearest Neighbor worksheet
+# R code for plot.pdf
 set.seed(22)
 x = c(rnorm(10), rnorm(10) + 1)
 y = c(rnorm(10) + 1, rnorm(10))

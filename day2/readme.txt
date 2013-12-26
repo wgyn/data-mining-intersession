@@ -1,4 +1,4 @@
-classification.tex:		beamer source for primary lecture slides for day 2
+classification.tex		source for day 2 slides
 
 k-nearest neighbors.r:		R code for plot.pdf
 
