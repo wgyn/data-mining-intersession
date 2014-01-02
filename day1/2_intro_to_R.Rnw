@@ -29,16 +29,20 @@
 
 \begin{frame}[fragile]{Data frames}
 \begin{block}{Let's start by reading in some real-life data}
-<<>>=
-  nba <- read.csv('nba_box_2012to2013.csv')
+<<eval=T, echo=F>>=
+  nba <- read.csv('C:/Users/R_Wang/Documents/Dropbox/basketball/data/box/box_2012to2013.csv')
+@
+<<eval=F, echo=T>>=
+  setwd('C:/GitHub/data-mining-intersession/day1/data')
+  nba <- read.csv('box_2012to2013.csv')
   class(nba)
 @
 \end{block}
-In R terminology, data typically comes in the form of a \textit{data.frame} (try ?data.frame). They share many properties with matrices but can also include non-numeric values.
+In R terminology, data typically comes in the form of a \textit{data.frame} (try ?data.frame). Data frames are similar to spreadsheets or matrices that can store non-numeric values.
 \end{frame}
 
 \begin{frame}[fragile]{Data frames cont.}
-\begin{block}{This is very similar to what you'd see if you opened the .csv file in MS Excel}
+\begin{block}{This is essentially the same as what you would see if you opened the .csv file in MS Excel}
 <<>>==
   nba[1:5,1:5]
 @
