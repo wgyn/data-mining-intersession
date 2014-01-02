@@ -148,28 +148,80 @@ square <- function(x) { return(x^2) } # minor segue on defining functions (see ?
 square(2)
 square(1:5)
 
-mod_cs <- function(x) { # define a modified function for cumulative sum
-  x2 <- replace(x, is.na(x), 0)
-  return(cumsum(x2))
-}
+## note: we are sidestepping the issue that not all players were active in every game
+##       e.g. Carmelo Anthony has only 74 entries
+nba2 <- nba[order(nba$pid, nba$game_id),] # sort our dataframe by player and game
+nba2$pts <- replace(nba2$pts, is.na(nba2$pts), 0)
+ppg_roll <- tapply(nba2$pts, nba2$pid, cumsum) # "tapply" is a general version of aggregate and returns a list
+gp_roll <- tapply(nba2$gp, nba2$pid, cumsum)
 
-nba <- nba[order(nba$pid, nba$game_id),] # sort our dataframe by player and game
-ppg_roll <- tapply(nba2$pts, nba2$player, mod_cs) # TO DO: explain output
-plot(ppg_roll[['LeBron James']] / cumsum(lbj$gp), type='l', ylim=c(20,30)) # TO DO: explain lists
-lines(ppg_roll[['Kevin Durant']] / cumsum(lbj$gp), type='l', col='red')
+plot(ppg_roll[['1966']] / gp_roll[['1966']], type='l', ylim=c(20,35)) # LeBron James
+lines(ppg_roll[['3202']] / gp_roll[['3202']], type='l', col='red') # Kevin Durant
+lines(ppg_roll[['110']] / gp_roll[['110']], type='l', col='blue') # Kobe Bryant
 
-## exercises:
-## 1: TO DO
-## 2: nba does not contain entries for when players are inactive e.g.
-##    Carmelo only has 67 entries, fix the calculation for ppg_roll so that
-##    he is comparable to players with 82 entries (challenge)
-
-##
-## TO DO: Scatter plots, segue into linear regression
-##
-
-## how do stats vary with each other?
-stats <- c('reb','ast','stl','blk','tos','pts','gp')
+## what is the relationship between various statistics?
+## e.g. do high scorers collect more rebounds?
+stats <- c('min','reb','ast','stl','blk','tos','pts','gp')
 season <- aggregate(nba[,stats], list(pid=nba$pid), sum, na.rm=T)
 season <- merge(season, plyrs, by='pid')
-per_game <- cbind(season[,c('pid','player')], season[,2:7]/season$gp)
+per_game <- cbind(season[,c('pid','player')], season[,2:8]/season$gp)
+
+with(per_game, plot(y=pts, x=reb)) # a scatter plot of ppg versus rpg
+with(per_game, plot(pts~tos)) # a scatter plot of ppg versus tpg
+with(per_game, cor(pts, tos, use='complete')) # a measure of the relationship's strength
+# seems to be a positive relationship between points and rebounds
+
+## exercises:
+## 1: plot a histogram of rebounds per game by player. what does it tell you?
+## 2: think of other ways to describe the distribution of ppg and rpg (e.g. try ?sd, ?mean, ?quantile)
+## 3: try scatter plots of different statistics. what is a drawback of per game statistics? (hint: try minutes played)
+## 4 (challenge): fix the active player issue above so that you can trace
+##			their statistics through all 82 games of the season
+##			(hint: you will need game dates from "box_ov_2012to2013.csv")
+
+##
+## Linear regression
+##
+
+## per game statistics are influenced by minutes played
+## per minute (typically per 48 minute) statistics are better for certain comparisons
+with(per_game, plot(pts~min))
+with(per_game, plot(reb~min))
+per_48min <- cbind(season[,c('pid','player')], season[,3:8]/season$min*48)
+
+per_48min2 <- per_48min[order(per_48min$pts, decreasing=T),]
+per_48min2[1:5,] # Henry Sims is first??
+season[season$pid==6647,] # he played only 5 minutes... we have a sample size problem
+per_48min$qualify <- with(season, gp>=70 | pts>=1400) # try espn's criteria
+
+p48m_q <- per_48min[per_48min$qualify,]
+with(p48m_q, plot(pts~reb))
+with(p48m_q, cor(pts,reb)) # slightly negative relationship
+
+## using linear regression (i.e. fitting a line through the scatter plot)
+m1 <- lm(pts~reb, data=p48m_q)
+summary(m1) # (Intercept) is the intercept, reb is the slope of the line
+with(p48m_q, plot(pts~reb))
+abline(m1, col='red')
+
+## multiple controls using multivariate regression
+m2 <- lm(pts~reb+min, data=per_game)
+summary(m2) # typical interpretation: for each additional mpg, the average player scores .52 additional ppg
+
+m3 <- lm(pts~reb+min+tos, data=per_game)
+summary(m3) # accounting for TOs, there is essentially no relation between ppg and rpg
+
+## regression models can be used as predictive models
+fake_player <- as.data.frame(list(reb=8.0,min=20.0,tos=1.5))
+predict(m3, newdata=fake_player) # the model predicts he would score 8.6ppg
+
+## exercises:
+## 1: In simple linear regression, the slope is given by cov(x,y)/var(x)
+##    The (pearson) correlation is given by cor(x,y)=cov(x,y)/(sd(x)*sd(y))
+##    Calculate the slope for m2 by hand using ?cor and ?sd functions. What does this tell you about correlation?
+## 2: Create a regression model for predicting a player's scoring (ppg) from previous year's scoring
+##    a - Read in "box_2011to2012.csv" and calculate ppg for each player
+##    b - Plot ppg_12to13 against ppg_11to12
+##    c - Fit a regression model
+##    d - Qualitatively test how well the model predicts 2013-2014 stats from 2012-2013 (use ESPN player pages e.g. http://espn.go.com/nba/player/_/id/110)
+##    e - Consider including other variables e.g. minutes, team, etc.
