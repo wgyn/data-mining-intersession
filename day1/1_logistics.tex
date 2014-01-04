@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{multicol}
 
 \title{Introduction to Data Mining}
 \author{Scott Powers and Ryan Wang}
@@ -12,41 +13,41 @@
 \titlepage
 \end{frame}
 
-%%% INTRO %%%
+\begin{frame}
+\frametitle{About us}
+\begin{multicols}{2}
+Scott is getting his PhD in statistics from Stanford. \\
+\columnbreak
+Ryan is a Senior Consultant at The Greatest Good.
+\end{multicols}
+\end{frame}
 
 \begin{frame}
-\frametitle{About}
-TO DO
+\frametitle{Course logistics}
+\begin{itemize}
+	\item The goal of the course is to introduce the basic concepts of data mining and teach you to work with structured data.
+	\item You can do some data analysis in point-and-click applications like MS Excel or Tableau, but most work (e.g. data wrangling or predictive modeling) will require some basic programming.
+	\item We will use the statistical programming language R, which is heavily used in both industry and academia. Other popular options are Python, SAS, and SQL.
+	\item Each day we'll (roughly) spend:
+	\begin{itemize}
+		\item Half the time teaching concepts by working through examples
+		\item 30 minutes on break, watching the movie Moneyball
+		\item Rest of the time exploring datasets that we've prepared
+	\end{itemize}
+\end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{What is data mining?}
 \begin{itemize}
 	\item Data mining is the process of extracting insights and understanding from data
-	\item Revolutions in computing have drastically lowered the cost of collecting, storing, and analyzing data
-	\item The list of influential applications is really long. For example:
+	\item Revolutions in computing have drastically lowered the cost of collecting, storing, and analyzing data, which has led to big changes in industry, academia, and government:
 	\begin{itemize}
-		\item Search engines e.g. Google
-		\item Sensor-driven devices e.g. self-driving cars
-		\item Recommenders e.g. Amazon or Netflix
-		\item Responsive systems e.g. smart grid
-		\item Fraud detection
-	\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Course structure}
-\begin{itemize}
-	\item The goal of the course is to introduce the basic concepts of data mining and teach you to work with structured data
-	\item The best way to learn is by answering questions you find interesting! 
-	\item As such we will break up into teams of 3 to work on projects (Scott and I have prepared a number of datasets), and the last day will be devoted to presenting your findings as a team
-	\item The daily schedule will be (roughly):
-	\begin{itemize}
-		\item 45 minutes of lecture
-		\item 45 minutes of working through an example
-		\item 30 minutes of break (to watch the movie Moneyball)
-		\item 60 minutes of self-directed project work
+		\item Facebook uses social data to predict "People you may know"
+		\item Retailers (e.g. Amazon and Target) use your purchasing history to advertise other relevant products
+		\item TO DO: Academia
+		\item City of Chicago uses crime data to target police patrols (\href{http://dssg.io/projects/}{link})
+		\item Federal government has released over 80,000 datasets since 2009 on \url{http://data.gov}
 	\end{itemize}
 \end{itemize}
 \end{frame}
@@ -57,15 +58,7 @@ TO DO
 	\item All course materials will be hosted on Dropbox
 	\item This will include datasets, lecture notes, sample code, and links to external resources
 	\item Link: \url{https://www.dropbox.com/sh/bpl1oz5fkx3ml1s/rJVUljAoNC}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Getting R}
-\begin{itemize}
-	\item We will be using the open-source statistical programming language R, which is used heavily in both academia and industry for data analysis
-	\item We will also use RStudio, an interactive development environment which makes programming in R much easier
-	\item Download R here: \url{http://www.r-project.org/}
-	\item Download RStudio here: \url{http://www.rstudio.com/}
+	\item TO DO: Put finalized materials on Dropbox? Or just give them the GitHub link?
 \end{itemize}
 \end{frame}
 
