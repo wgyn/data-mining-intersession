@@ -2,9 +2,8 @@
 ## Basics: Dataframes
 ##
 
-## set dropbox path
-# setwd('C:/Users/RYWANG/Documents/GitHub/data-mining-intersession/day1')
-setwd('C:/Users/R_Wang/Documents/Dropbox/basketball/data/box')
+## set github path
+setwd('~/GitHub/data-mining-intersession/day1')
 
 ## read in data frame
 nba <- read.csv('box_2012to2013.csv', stringsAsFactors=FALSE)

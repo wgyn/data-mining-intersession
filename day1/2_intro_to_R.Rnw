@@ -4,6 +4,14 @@
 \usepackage{graphicx}
 \usepackage{listings}
 
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
 \title{An introduction to R}
 \author{Scott Powers and Ryan Wang}
 
@@ -14,27 +22,26 @@
 \titlepage
 \end{frame}
 
-\begin{frame}[fragile]{The most important command}
+\begin{frame}[fragile]{The help function}
 \begin{itemize}
   \item R is a very well-documented language
-  \item The most important function is help, as it allows you to access that documentation
+  \item A crucial function is help, as it allows you to access that documentation
   \item It can be accessed by help(function) or ?function for short e.g. type ?help to learn more about the help function
   \item Google is also a great resource and usually links to either \href{http://stackoverflow.com/questions/tagged/r}{stackoverflow} or \href{http://www.r-project.org/mail.html}{the R mailing list}
 \end{itemize}
 \end{frame}
 
-%%
-%% A TASTE OF DATA
-%%
+%%%
+%%%
+\section{Data frames}
+%%%
+%%%
 
 \begin{frame}[fragile]{Data frames}
 \begin{block}{Let's start by reading in some real-life data}
-<<eval=T, echo=F>>=
-  nba <- read.csv('C:/Users/R_Wang/Documents/Dropbox/basketball/data/box/box_2012to2013.csv')
-@
-<<eval=F, echo=T>>=
-  setwd('C:/GitHub/data-mining-intersession/day1/data')
-  nba <- read.csv('box_2012to2013.csv')
+<<>>=
+  setwd('~/GitHub/data-mining-intersession/day1')
+  nba <- read.csv('box_2012to2013.csv', stringsAsFactors=F)
   class(nba)
 @
 \end{block}
@@ -51,7 +58,7 @@ Columns correspond to \textit{variables} e.g. column 5 indicates the number of m
 \end{frame}
 
 \begin{frame}[fragile]{Data frames cont.}
-\begin{block}{This data frame contains 31,375 rows (observations) and 18 columns (variables)}
+\begin{block}{This data frame contains 31,375 rows (observations) and 19 columns (variables)}
 <<>>==
 nrow(nba)
 ncol(nba)
@@ -60,62 +67,356 @@ dim(nba)
 \end{block}
 \end{frame}
 
-%%
-%% FUNDAMENTAL VECTOR CONCEPTS
-%%
+\begin{frame}[fragile]{Data frames cont.}
+\begin{block}{Specific elements of the data can be accessed with [row, column] coordinates}
+<<>>==
+  nba[1:2,1:2]
+  nba[1,1]
+  nba[2,1]  
+@
+\end{block}
+We'll discuss subsetting data frames more in-depth after we have seen how vectors (and specifically sequences) work.
+\end{frame}
+
+%%%
+%%%
+\section{Vectors}
+%%%
+%%%
 
 \begin{frame}[fragile]{Vectors}
 \begin{block}{The fundamental unit of computation in R is the vector. Create a vector by combining values with the "c" function (see ?vector and ?c):}
 <<>>==
-  v1 <- c(1,2,3,4,5)
-  v2 <- c('a','b','c','d')
-  v1
-  v2
-  is.vector(v1)
+  c(1,2,3,4,5)
+  c('a','b','c','d','e')
 @
 \end{block}
 \end{frame}
 
 \begin{frame}[fragile]{Vectors cont.}
-\begin{block}{Most functions involving vectors (as well as matrices) operate element-wise:}
+\begin{block}{Assign a value, which includes vectors, to a name using the "<-" operator (see ?assignOps)}
+<<>>==
+  v1 <- c(1,2,3,4,5)
+  v1
+  v1[1]
+@
+\end{block}
+The first element of v1 is 1, and the second element is 2. Note that unlike most programming languages, indexing starts at 1.
+\end{frame}
+
+\begin{frame}[fragile]{Vectors cont.}
+\begin{block}{Most functions involving vectors operate element-wise:}
 <<>>==
   v1 + 3
   v1 + v1 
   sqrt(v1)
+  (v1 + v1)[2]
 @
 \end{block}
 \end{frame}
 
 \begin{frame}[fragile]{Vectors cont.}
-\begin{block}{The ":" operator (see ?colon) creates sequences}
+\begin{block}{The ":" operator (see ?colon) creates a sequence, which is also a vector}
 <<>>==
-1:5
+  x <- 1:5
+  x
+  x[1]
 @
 \end{block}
-\begin{block}{The "runif" function (see ?runif) generates random numbers}
+\begin{block}{Many functions return vectors. For example, "runif" returns a random vector of length n (see ?runif).}
 <<>>==
 runif(5)
-runif(5, min=1, max=5)
 @
 \end{block}
 \end{frame}
 
 \begin{frame}[fragile]{Vectors cont.}
-\begin{block}{Boolean values (TRUE and FALSE) are very useful (we'll soon see an application)}
+\begin{block}{Boolean values are TRUE and FALSE, or T and F for short (see ?logical)}
 <<>>==
 TRUE & FALSE
 !(!T & F)
 @
 \end{block}
-\begin{block}{Can also do vector operations}
+\begin{block}{It is easy to create boolean vectors by writing conditions. This will come in handy soon.}
 <<>>==
 1:5 > 2
 @
 \end{block}
 \end{frame}
 
-%%
-%% BACK TO THE DATA
-%%
- 
+%%%
+%%%
+\section{Exploring the data}
+%%%
+%%%
+
+\begin{frame}[fragile]{Exploring the data}
+\begin{block}{Now that we know about sequences, see that the data frame is subsetted by passing vectors as rows and/or columns}
+<<>>==
+  nba[1:5,1:5] # rows 1 to 5, columns 1 to 5
+@
+<<eval=F>>==
+  nba[1:5,] # would give rows 1 to 5, all columns
+@
+\end{block}
+As you can see, you can access all the entries along a particular dimension by leaving the slot blank. What would happen if you typed \emph{nba[,]}?
+\end{frame}
+
+\begin{frame}[fragile]{Exploring the data cont.}
+\begin{block}{The neat thing about data frames is that columns are named. Access specific columns with the "\$" operator (see ?Extract)}
+<<>>==
+  names(nba)[1:5]
+  nba$pid[1:5]
+  nba[1:5, 'pid'] # alternatively...
+@
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Exploring the data cont.}
+\begin{block}{Using boolean vectors, we can subset the data to look at specific players' statistics}
+<<>>==
+  lbj <- nba[nba$player == "LeBron James",]
+  basic <- c('player','min','pts','reb')
+  lbj[1:5,basic]
+@
+\end{block}
+Under the hood, the boolean vector is being translated into a vector of indices for the TRUE entries. This can be accomplished explicitly by using the "which" function on a boolean vector (see ?which).
+\end{frame}
+
+\begin{frame}[fragile]{Exploring the data cont.}
+\begin{block}{It's not enough to know only the dimensions of the data frame, which tell us the number of box scores. We might need to know things such as: how many players were active?}
+<<>>==
+  v1 <- c('a','a','b','d')
+  unique(v1)
+  length(unique(v1))
+  length(unique(nba$pid)) # number of players active
+@
+\end{block}
+The "unique" function returns the unique values that appear in the inputted vector. The "length" function returns its length.
+\end{frame}
+
+\begin{frame}[fragile]{Exercises!}
+\begin{enumerate}
+  \item Create a vector containing the even numbers between 1 and 50
+  \item Create a subset of the data that contains entries for all point guards (PG)
+  \item What are the dimensions of the data.frame from 2)?
+  \item How many total games were played in the '12-'13 season? (note: some questions don't require data)
+\end{enumerate}
+\end{frame}
+
+%%%
+%%%
+\section{Basic calculations}
+%%%
+%%%
+
+\begin{frame}[fragile]{Time for some fun!}
+\begin{block}{We now have some basic tools for exploring and manipulating data. We can use them to answer question such as: how many points did LeBron James score in the '12-'13 season?}
+<<>>==
+  sum(lbj$pts) # see ?sum (hopefully you know this...)
+@
+\end{block}
+He scored 'NA' points??!?
+\end{frame}
+
+\begin{frame}[fragile]{Time for some fun! cont.}
+\begin{block}{One more thing: our data contains missing values (see ?NA and ?is.na)}
+<<>>==
+  lbj[lbj$game_id=='400278818',basic] # did not play
+@
+\end{block}
+Sorry for the pump fake... How to deal with missing data is an important consideration (which has luckily been taken care of for us). I once saw a company using 0, 10, and 100 to indicate invalid values in a dataset that tracked dollar amounts!?
+\end{frame}
+
+\begin{frame}[fragile]{Time for some fun! cont.}
+\begin{block}{To get around the missing values, we need to specify the "na.rm" option in the "sum" function}
+<<>>==
+  sum(lbj$pts, na.rm=T)
+@
+\end{block}
+Check this against ESPN's records \url{http://espn.go.com/nba/player/stats/_/id/1966/lebron-james}. We're off...
+\end{frame}
+
+\begin{frame}[fragile]{Time for some fun! cont.}
+\begin{block}{Our data says 2,055 while ESPN says 2,036. What gives?}
+<<>>==  
+  nba[nba$game_id=='400436572',][1:5,basic]
+@
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Time for some fun! cont.}
+\begin{block}{... because it's the All-Star game! Let's try removing it.}
+<<>>==
+  nba <- subset(nba, nba$game_id!='400436572')
+  lbj <- nba[nba$player == "LeBron James",] 
+  sum(lbj$pts, na.rm=T) # much better
+@
+\end{block}
+"Real-world" data is rarely clean. You have to constantly check it against your intuition and what you know to be true e.g. other sources. Some people think this "data munging" is unsexy but necessary (\href{http://inside-bigdata.com/2013/11/15/unsexy-part-data-science-data-munging/}{link}). Others come up with cooler names and name their blogs after them (\href{http://www.datawrangling.com/about/}{link}).
+\end{frame}
+
+\begin{frame}[fragile]{Most points per game (PPG)}
+\begin{block}{Isn't this fun? Let's try answering more substantive questions such as: What was the highest PPG in '12-'13?}
+%% TO DO: This doesn't show up fully on the .pdf
+<<>>==
+  nba$gp <- as.integer(!is.na(nba$min)) # boolean values can be converted to integers
+  ppg <- aggregate(nba[,c('pts','gp')], by=list(pid=nba$pid), FUN=sum, na.rm=T)
+  ppg$ppg <- ppg$pts / ppg$gp
+  max(ppg$ppg, na.rm=T)
+@
+\end{block}
+The "aggregate" function subsets a dataset by it's "by" argument and applies the "FUN" argument (which in this case is a function) to each subset. Here, we are calculating the sum of the 'pts' vector and the sum of the 'gp' vector for each 'pid'. This idea is known as split-apply-combine (\href{https://www.google.com/search?q=split+apply+combine}{link}). 
+\end{frame}
+
+\begin{frame}[fragile]{Most points per game (PPG) cont.}
+\begin{block}{Let's determine the identity of this mysterious high-scorer.}
+<<>>==
+  idx <- which.max(ppg$ppg)
+  ppg$pid[idx] # It's player 1975!
+@
+\end{block}
+\begin{block}{How about with something a bit more personal?}
+<<>>==
+  plyrs <- unique(nba[,c('pid','player')])
+  ppg <- merge(ppg, plyrs, by='pid')
+  ppg$player[idx]
+@
+\end{block}
+We use "unique" to get a mapping from pid to the player's name. Then we use the "merge" function to add player names to the ppg data frame. Merging is also known as joining in other languages (e.g. SQL).
+\end{frame}
+
+\begin{frame}[fragile]{Most points per game (PPG) cont.}
+\begin{block}{What if we want to know the top 5 scorers? The top N scorers (That would be more like it!)?}
+<<>>==
+  N <- 5
+  ord_ppg <- order(ppg$ppg, decreasing=T)
+  ord_ppg[1:N] # returns a sorted vector of indices  
+  
+  ppg_sorted <- ppg[ord_ppg,]
+  ppg_sorted[1:N,]
+@
+\end{block}
+\end{frame}
+
+\begin{frame}{More exercises!}
+\begin{enumerate}
+  \item Calculate per-game stats for your favorite player (e.g. reb, ast, blk) and check that match they ESPN's
+  \item Which player scored the most total points?
+  \item Which player gathered the most rebounds per game?
+  \item Which team scored the most points per game?
+\end{enumerate}
+\end{frame}
+
 \end{document}
+
+\begin{comment}
+
+##
+## Visualizing data
+##
+
+## what is the distribution of players in terms of points per game?
+hist(ppg$ppg) # the "hist" function computes frequencies e.g. # of players who scored 0-5 ppg
+hist(ppg$ppg, breaks=seq(from=0,to=30,by=2.5))
+
+## bar chart of top players
+par(las=2)
+with(per_game[order_ppg[1:10],], barplot(pts, horiz=T, names.arg=player, xlim=c(0,30)))
+
+## how does LeBron's ppg look over the course of the season?
+lbj <- subset(nba, player=='LeBron James')
+lbj_pts <- replace(lbj$pts, is.na(lbj$pts), 0)
+lbj_ppg <- cumsum(lbj_pts) / cumsum(lbj$gp) # this is a "rolling" calculation
+plot(lbj_ppg, type='l', ylab='PPG', xlab='Game #')
+
+## how does it compare to Kevin Durant's?
+kd <- subset(nba, player=='Kevin Durant')
+kd_pts <- replace(kd$pts, is.na(kd$pts), 0)
+kd_ppg <- cumsum(kd_pts) / cumsum(kd$gp) # this is a "rolling" calculation
+plot(lbj_ppg, type='l', ylab='PPG', xlab='Game #', ylim=c(20,30))
+lines(kd_ppg, type='l', col='red') # add lines to an existing plot
+
+## what if we wanted to compare any two players?
+square <- function(x) { return(x^2) } # minor segue on defining functions (see ?function)
+square(2)
+square(1:5)
+
+## note: we are sidestepping the issue that not all players were active in every game
+##       e.g. Carmelo Anthony has only 74 entries
+nba2 <- nba[order(nba$pid, nba$game_id),] # sort our dataframe by player and game
+nba2$pts <- replace(nba2$pts, is.na(nba2$pts), 0)
+ppg_roll <- tapply(nba2$pts, nba2$pid, cumsum) # "tapply" is a general version of aggregate and returns a list
+gp_roll <- tapply(nba2$gp, nba2$pid, cumsum)
+
+plot(ppg_roll[['1966']] / gp_roll[['1966']], type='l', ylim=c(20,35)) # LeBron James
+lines(ppg_roll[['3202']] / gp_roll[['3202']], type='l', col='red') # Kevin Durant
+lines(ppg_roll[['110']] / gp_roll[['110']], type='l', col='blue') # Kobe Bryant
+
+## what is the relationship between various statistics?
+## e.g. do high scorers collect more rebounds?
+stats <- c('min','reb','ast','stl','blk','tos','pts','gp')
+season <- aggregate(nba[,stats], list(pid=nba$pid), sum, na.rm=T)
+season <- merge(season, plyrs, by='pid')
+per_game <- cbind(season[,c('pid','player')], season[,2:8]/season$gp)
+
+with(per_game, plot(y=pts, x=reb)) # a scatter plot of ppg versus rpg
+with(per_game, plot(pts~tos)) # a scatter plot of ppg versus tpg
+with(per_game, cor(pts, tos, use='complete')) # a measure of the relationship's strength
+# seems to be a positive relationship between points and rebounds
+
+## exercises:
+## 1: plot a histogram of rebounds per game by player. what does it tell you?
+## 2: think of other ways to describe the distribution of ppg and rpg (e.g. try ?sd, ?mean, ?quantile)
+## 3: try scatter plots of different statistics. what is a drawback of per game statistics? (hint: try minutes played)
+## 4 (challenge): fix the active player issue above so that you can trace
+##      their statistics through all 82 games of the season
+##			(hint: you will need game dates from "box_ov_2012to2013.csv")
+
+##
+## Linear regression
+##
+
+## per game statistics are influenced by minutes played
+## per minute (typically per 48 minute) statistics are better for certain comparisons
+with(per_game, plot(pts~min))
+with(per_game, plot(reb~min))
+per_48min <- cbind(season[,c('pid','player')], season[,3:8]/season$min*48)
+
+per_48min2 <- per_48min[order(per_48min$pts, decreasing=T),]
+per_48min2[1:5,] # Henry Sims is first??
+season[season$pid==6647,] # he played only 5 minutes... we have a sample size problem
+per_48min$qualify <- with(season, gp>=70 | pts>=1400) # try espn's criteria
+
+p48m_q <- per_48min[per_48min$qualify,]
+with(p48m_q, plot(pts~reb))
+with(p48m_q, cor(pts,reb)) # slightly negative relationship
+
+## using linear regression (i.e. fitting a line through the scatter plot)
+m1 <- lm(pts~reb, data=p48m_q)
+summary(m1) # (Intercept) is the intercept, reb is the slope of the line
+with(p48m_q, plot(pts~reb))
+abline(m1, col='red')
+
+## multiple controls using multivariate regression
+m2 <- lm(pts~reb+min, data=per_game)
+summary(m2) # typical interpretation: for each additional mpg, the average player scores .52 additional ppg
+
+m3 <- lm(pts~reb+min+tos, data=per_game)
+summary(m3) # accounting for TOs, there is essentially no relation between ppg and rpg
+
+## regression models can be used as predictive models
+fake_player <- as.data.frame(list(reb=8.0,min=20.0,tos=1.5))
+predict(m3, newdata=fake_player) # the model predicts he would score 8.6ppg
+
+## exercises:
+## 1: In simple linear regression, the slope is given by cov(x,y)/var(x)
+##    The (pearson) correlation is given by cor(x,y)=cov(x,y)/(sd(x)*sd(y))
+##    Calculate the slope for m2 by hand using ?cor and ?sd functions. What does this tell you about correlation?
+## 2: Create a regression model for predicting a player's scoring (ppg) from previous year's scoring
+##    a - Read in "box_2011to2012.csv" and calculate ppg for each player
+##    b - Plot ppg_12to13 against ppg_11to12
+##    c - Fit a regression model
+##    d - Qualitatively test how well the model predicts 2013-2014 stats from 2012-2013 (use ESPN player pages e.g. http://espn.go.com/nba/player/_/id/110)
+##    e - Consider including other variables e.g. minutes, team, etc.
+\end{comment}
