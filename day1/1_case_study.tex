@@ -4,50 +4,66 @@
 \usepackage{graphicx}
 \usepackage{multicol}
 
+\setkeys{Gin}{width=.5\textwidth}
+
 \title{Case study: data-driven pricing}
 \author{Scott Powers and Ryan Wang}
 
+\usepackage{Sweave}
 \begin{document}
+\input{1_case_study-concordance}
 
 \begin{frame}
 \titlepage
 \end{frame}
 
-\begin{frame}{The problem}
+\begin{frame}[fragile]{The problem}
 \begin{itemize}
 	\item A retail client wanted to improve their strategy for pricing apparel. 
-	\item In the past, they would start with a base price (usually set by executives) and mark-down whatever wasn't sold towards the end of the season.
-	\item As such, plotting price over time would usually give something like:
-	\item TO DO: INCLUDE FAKE PLOT, PRICE VS WEEK, LINEARLY DECREASING, BIG DROP AT END
+	\item In the past, they would start with a base price (usually set by executives) and mark-down whatever wasn't sold towards the end of the season. It would typically look something like:
+  \begin{figure}
+    \includegraphics{figs/price_season.pdf}
+  \end{figure}
 \end{itemize}
 \end{frame}
 
 \begin{frame}{The problem cont.}
 \begin{itemize}
-	\item However, this heuristic pricing led to high variance in sell-through rates at the end of the season:
-	\item TO DO: INCLUDE FAKE PLOT, ALMOST UNIFORM DISTRIBUTION IN SELL-THROUGH (S19 OF APPAREL PRICING DECK)
+	\item However, this heuristic pricing led to high variance in sell-through rates at the end of the season.
 	\item Popular products would sell out too quickly, while unpopular products would never sell out and turn into excess inventory at the end of the season.
 	\item A better strategy would have been to raise prices on popular products (or discount them less aggressively), and vice versa for unpopular products.
 \end{itemize}
 \end{frame}
 
+\begin{frame}{The problem cont.}
+\begin{itemize}
+  \item A histogram of sell-through rates at the end of the season would look like:
+  \begin{figure}
+    \includegraphics[height=.8\textheight,keepaspectratio=true]{figs/sell_through.pdf}
+  \end{figure}
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Using data to improve pricing}
 \begin{itemize}
-	\item On a weekly basis, the data-driven pricing model took in inputs such as last week's sales and the week (e.g. if it's the week of Thanksgiving) and outputted recommended prices
-	\item The model roughly said to maximize profit ($\Pi$) by changing price (P)...
+	\item A bit of economics can be used to create a model that maximizes profits over the entirety of the season.
+	\item Roughly we'd like to maximize profit ($\Pi$) by changing price (P)...
 	$$ max_P \Pi = PQ_s - CQ_0 $$
 	\item ...where quantity sold is a function of price, demand (D), and elasticity ($\epsilon$), which is a fancy term for the responsiveness of buyers to price
-	$$ Q = DP^{\epsilon} $$ 
+	$$ Q_s = DP^{\epsilon} $$
+  \item Using data to implement the model, we would take in weekly inputs such as last week's sales and time of year and output recommended prices
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Two data-mining tasks}
-\begin{enumerate}
-	\item Estimate elasticity, or how responsive buyers are to price
-	\item TO DO: INCLUDE FAKE PLOT OF QUANTITY VERSUS PRICE WITH FITTED LINE
-	\item Predict demand
-	\item TO DO: SHOW A TIME SERIES OF DEMAND WITH DOTTED LINES TO INDICATE POSSIBLE 'FORECASTS'
-\end{enumerate}
+\begin{itemize}
+  \item A common task in many fields (physics, economics, etc) is to estimate an equation from noisy data
+  \item We observe combinations of price and quantity sold e.g. sold 10 dresses when pricing at \$10
+  \item We could then fit a line to estimate $D$ and $\epsilon$, tracing out the price-quantity relationship and allowing for predictions.
+  \begin{figure}
+    \includegraphics[height=.6\textheight,keepaspectratio=true]{figs/pq.pdf}
+  \end{figure}  
+\end{itemize}
 \end{frame}
 
 \end{document}
