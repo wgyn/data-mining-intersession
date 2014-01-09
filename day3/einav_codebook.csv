@@ -1,0 +1,53 @@
+variable,type,description
+filmtitl,,film title
+movie,,movie id
+day,,release day of the month
+month,,release month
+year,,release year
+genre,categorical,1 action; 2 comedy; 3 drama; 4 children
+sequel,categorical,0 no; 1 yes
+mpaa,categorical,1 G/PG; 2 PG13; 3 R; 4 NC17/NR
+runtime,,runtime in weeks
+distrib,categorical,distributor id
+max_scrn,,maximum screen count over runtime
+cum_rev,,cumulative BO revenues
+prod_cos,,production costs
+wknd1,,BO revenues in weekend 1
+wknd2,,BO revenues in weekend 2
+wknd3,,BO revenues in weekend 3
+wknd4,,BO revenues in weekend 4
+wknd5,,BO revenues in weekend 5
+wknd6,,BO revenues in weekend 6
+wknd7,,BO revenues in weekend 7
+wknd8,,BO revenues in weekend 8
+wknd9,,BO revenues in weekend 9
+wknd10,,BO revenues in weekend 10
+week0,,BO revenues in week 0 (midweek release)
+week1,,BO revenues in week 1 (Fri-Thu; weekend incl)
+week2,,BO revenues in week 2 (Fri-Thu; weekend incl)
+week3,,BO revenues in week 3 (Fri-Thu; weekend incl)
+week4,,BO revenues in week 4 (Fri-Thu; weekend incl)
+week5,,BO revenues in week 5 (Fri-Thu; weekend incl)
+week6,,BO revenues in week 6 (Fri-Thu; weekend incl)
+week7,,BO revenues in week 7 (Fri-Thu; weekend incl)
+week8,,BO revenues in week 8 (Fri-Thu; weekend incl)
+week9,,BO revenues in week 9 (Fri-Thu; weekend incl)
+week10,,BO revenues in week 10 (Fri-Thu; weekend incl)
+scrns1,,Screen count week 1
+scrns2,,Screen count week 2
+scrns3,,Screen count week 3
+scrns4,,Screen count week 4
+scrns5,,Screen count week 5
+scrns6,,Screen count week 6
+scrns7,,Screen count week 7
+scrns8,,Screen count week 8
+scrns9,,Screen count week 9
+scrns10,,Screen count week 10
+animated,categorical,0 no; 1 yes
+bestpic,categorical,Best picture award: 1 nominated; 2 won
+ads,,cumulative (pre and post release) advertising expenditure
+cpi,,CPI
+cpi_def,,CPI deflator
+weekday,,release day of the week
+weekdum,,calendar week dummy (1-56; see paper)
+market,,market (week) id
