@@ -19,9 +19,18 @@ Classification
 \end{frame}
 
 \begin{frame}
+\frametitle{Introduction to Statistical Learning}
+\includegraphics[scale = 0.4]{isl.jpg}\\~\\
+Available as a pdf for free online (legally)!\\~\\
+Today: Chapter 4
+\end{frame}
+
+\begin{frame}
 \frametitle{Classification}
 Yesterday: Regression\\
-Goal: Predict a number, e.g. ...
+Goal: Predict a {\bf quantitative} response\\~\\
+Today: Classification\\
+Goal: Predict a {\bf qualitative} response
 \end{frame}
 
 \begin{frame}
@@ -101,10 +110,42 @@ How do we define similarity?
 
 \begin{frame}
 \frametitle{Method 2: Linear Regression}
+What happens if we apply linear regression to these data?\\
+\pause\vspace{2cm}
+How do we interpret this output?\\
+\pause\vspace{2cm}
+How does this prediction compare with $k$-NN?
+\end{frame}
+
+\begin{frame}
+\frametitle{Problems with linear regression as a classification method}
+-- Interpretability\\
+\vspace{1cm}
+-- Assumption: $y_i \sim \mathcal N(\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip}, \sigma^2)$\\~\\
+We would like to see something along the lines of:
+$$y_i = \left\{\begin{array}{ll}
+	1	& \mbox{ with probability }\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip}\\\\
+	0	& \mbox{ with probability }1 - (\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip})
+\end{array}\right.$$
+\\\vspace{1cm}
+-- Also: difficult to extend beyond two classes
 \end{frame}
 
 \begin{frame}
 \frametitle{Method 3: Logistic Regression}
+$$y_i = \left\{\begin{array}{ll}
+	1	& \mbox{ with probability }\frac{e^{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip}}}{1 + e^{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip}}}\\\\
+	0	& \mbox{ with probability }1 - \frac{e^{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip}}}{1 + e^{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip}}}
+\end{array}\right.$$
+\begin{center}
+\includegraphics[scale = 0.3]{logistic.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{How to fit the logistic regression model}
+Using ``least squares'' to find $\beta$'s doesn't make sense\\
+{\small In {\tt R}: Simply replace {\tt lm(...)} with {\tt glm(..., family = binomial)}}
 \end{frame}
 
 \begin{frame}
@@ -113,10 +154,6 @@ How do we define similarity?
 
 \begin{frame}
 \frametitle{Method 5: Quadratic Discriminant Analysis}
-\end{frame}
-
-\begin{frame}
-\frametitle{Method 6: Support Vector Machines}
 \end{frame}
 
 \end{document}

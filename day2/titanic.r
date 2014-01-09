@@ -65,3 +65,12 @@ validationSet = sample(1:891, 300)
 trainingNew = trainingCopy[-validationSet, ]
 testNew = testCopy[validationSet, ]
 survivedNew = trainingData$Survived[-validationSet]
+
+
+# Section 6: Applying and evaluating linear regression
+#  Ryan -- We may need to provide some helper code here, depending on how
+#  we introduce them to linear regression in R.
+
+# Section 7: Applying and evaluation logistic regression
+
+
