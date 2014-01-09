@@ -111,6 +111,38 @@ ppg[1:5,]
 
 ## check that this matches ESPN http://espn.go.com/nba/statistics/_/year/2013
 
+
+# Calculate rebounds, assists, and blocks per game (reb, ast, blk). Who are the top players in each category?
+nba$gp <- as.integer(!is.na(nba$min)) # boolean values can be converted to integers
+pg <- aggregate(nba[,c('pts','reb','ast','blk','gp')], list(pid=nba$pid), sum, na.rm=T)
+pg$ppg <- with(pg, pts/gp) # the "with" function is a shortcut
+pg$rpg <- with(pg, reb/gp) # the "with" function is a shortcut
+pg$apg <- with(pg, ast/gp) # the "with" function is a shortcut
+pg$bpg <- with(pg, blk/gp) # the "with" function is a shortcut
+
+order_ppg <- order(pg$ppg, decreasing=T)
+order_rpg <- order(pg$rpg, decreasing=T)
+order_apg <- order(pg$apg, decreasing=T)
+order_bpg <- order(pg$bpg, decreasing=T)
+
+plyrs <- unique(nba[,c('pid','player')]) # bring back player names
+pg <- merge(pg, plyrs, by='pid') # the "merge" function joins two dataframes
+pg[order_ppg[1:5],]
+pg[order_rpg[1:5],]
+pg[order_apg[1:5],]
+pg[order_bpg[1:5],]
+
+# Which team scored the most points per game?
+tpg <- aggregate(nba[,c('pts','gp')], list(team=nba$team), sum, na.rm=T)
+tpg[order(tpg$pts),]
+
+
+
+
+
+
+
+
 ## exercises:
 ## 1) check that your favorite player's season stats match his ESPN page
 ## 2) which player scored the most total points? (try ?max)
@@ -172,6 +204,12 @@ with(per_game, cor(pts, tos, use='complete')) # a measure of the relationship's 
 
 ## exercises:
 ## 1: plot a histogram of rebounds per game by player. what does it tell you?
+hist(pg$rpg, breaks = 20)
+
+
+
+
+
 ## 2: think of other ways to describe the distribution of ppg and rpg (e.g. try ?sd, ?mean, ?quantile)
 ## 3: try scatter plots of different statistics. what is a drawback of per game statistics? (hint: try minutes played)
 ## 4 (challenge): fix the active player issue above so that you can trace
