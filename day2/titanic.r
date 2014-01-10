@@ -88,3 +88,6 @@ predictionLM = predict(linearModel, as.data.frame(testNew))
 
 
 # Section 8: Applying and evaluating quadratic discriminant analysis
+
+forest = randomForest(trainingNew, as.factor(survivedNew))
+mean(predict(forest, testNew) == trainingData$Survived[validationSet])
