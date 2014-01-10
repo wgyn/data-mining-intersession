@@ -34,6 +34,9 @@ testCopy = cbind(
 	as.numeric(testData$Embarked == 'S')
 )
 
+colnames(trainingCopy) = colnames(testCopy) = c(
+	'class', 'sex', 'age', 'sib/sp', 'par/ch', 'fare', 'cherbourg', 'queenstown', 'southampton'
+)
 
 # Section 2: Dealing with the missing data
 
@@ -51,26 +54,40 @@ testCopy[2243] = 8
 # Section 3: Applying k-NN
 
 ?knn
-prediction = knn(trainingCopy, testCopy, trainingData$Survived)
-prediction
+predictionNN = knn(scale(trainingCopy), scale(testCopy), survival)
+predictionNN
 
 
-# Section 4: k-NN exercise
-
-
-# Section 5: Evaluating k-NN
+# Section 4: Evaluating k-NN
 
 set.seed(259)
 validationSet = sample(1:891, 300)
 trainingNew = trainingCopy[-validationSet, ]
-testNew = testCopy[validationSet, ]
+testNew = trainingCopy[validationSet, ]
 survivedNew = trainingData$Survived[-validationSet]
+# Use one line of code here to predict survival for the validation set
+# Use one line of code here to evaluate the prediction from the previous line
 
 
-# Section 6: Applying and evaluating linear regression
-#  Ryan -- We may need to provide some helper code here, depending on how
-#  we introduce them to linear regression in R.
+# Section 5: Applying and evaluating linear regression
 
-# Section 7: Applying and evaluation logistic regression
+linearModel = lm(survivedNew ~ ., data = as.data.frame(trainingNew))
+summary(linearModel)	# pause here to discuss interpretation
+predictionLM = predict(linearModel, as.data.frame(testNew))
+# Use one line of code here to convert the above predictions to 0s and 1s
+# Use one line of code here to evaluate the prediction from the previous line
 
 
+# Section 6: Applying and evaluating logistic regression
+
+# Adapt the code from Section 5 above to run a logistic regression.
+# Compare the prediction accuracy on the validation set
+
+
+# Section 7: Applying and evaluating linear discriminant analysis
+
+
+# Section 8: Applying and evaluating quadratic discriminant analysis
+
+forest = randomForest(trainingNew, as.factor(survivedNew))
+mean(predict(forest, testNew) == trainingData$Survived[validationSet])
