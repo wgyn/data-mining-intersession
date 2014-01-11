@@ -3,7 +3,8 @@
 
 ## read in the data
 
-movies <- read.csv('~/GitHub/data-mining-intersession/day3/einav_movie_data.csv', stringsAsFactors=F)
+setwd('~/GitHub/data-mining-intersession/day3')
+movies <- read.csv('einav_movie_data.csv', stringsAsFactors=F)
 movies <- movies[movies$max_scrn > 600,]
 movies$log_rev <- log(movies$cum_rev)
 movies$log_rev_w1 <- log(movies$week1)
@@ -37,6 +38,9 @@ cor(fitteds, movies$log_rev)^2 # it is the correlation between fitteds and actua
 residuals <- movies$log_rev - fitteds # by hand
 residuals <- m1$residuals # alternatively
 mean(residuals^2) # mean squared error (MSE) is another
+
+n <- nrow(movies)
+sqrt(1/(n-1) * sum(residuals^2)) # the correct answer, close to the above (corresponds to 'Residual standard error' in summary(m1))
 
 ## alternatively, want to know how well the model generalizes
 ## split the data in half, fit the model on one half and see how well it predicts on the other
