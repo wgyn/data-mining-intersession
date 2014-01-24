@@ -1,8 +1,8 @@
 ##
-## Basics: Dataframes
+## I. A LOOK AT THE DATA
 ##
 
-## set github path
+## set path
 setwd('~/GitHub/data-mining-intersession/day1')
 
 ## read in data frame
@@ -24,47 +24,71 @@ nba[1,]
 names(nba)
 
 ## can view the data as a spreadsheet
-View(nba) # avoid typing data itself because it will overflow the console
+View(nba) # avoid typing nba itself because it will overflow the console
 
 ##
-## Basics: Vectors
+## II. R BASICS
 ##
+
+## access specific elements of the data with [row, column] coordinates
+nba[1,1] # row 1, column 1
+nba[2,1] # row 2, column 1
+nba[1:2,1:2], # rows 1 to 2, columns 1 to 2
 
 ## introducing vectors
 v1 <- c(1,2,3,4,5) # 
 v2 <- c(6,7,8,9,10)
-v1
+v3 <- c('a','b','c','d','e')
 is.vector(v1)
 
+v1
+v2
+v3
+
+v1[1] # access specific elements of the vector
+v1[5]
+
 ## element-wise vector operations
-v1 + v2
-v1 * v2
 v1 + 3
+v1 + v1
 sqrt(v1)
+sum(v1^2) # sum takes in a vector, returns a number
 
-## Some useful vector functions
-1:5 # create "sequences" using the : operator (?colon)
-runif(5) # create random vectors using runif (stands for random uniform)
+## create "sequences" using the : operator (?colon)
+x <- 1:5
+x
+x[1]
 
-## besides numeric values, can also have boolean values (TRUE or FALSE)
+
+## boolean values are TRUE and FALSE
 (TRUE | FALSE) 
 !(!T & F) # T and F are abbreviations
-1:5 > 2
+
+x == v1 # element-wise comparisons for vectors
+1:5 > 2 # can create conditions
+
+## exercises:
+## 1) create a vector of the even numbers between 1 and 50
+## 2) what happens if you use ?sum on a vector of boolean values?
+## 3) what would happen if you ran nba[,]?
+## 4) explore R's built-in constants by reading the documentation (type ?Constants)
 
 ##
-## Exploring data
+## III. Exploring data
 ##
 
 ## can access subsets of the data using sequences
-nba[1:5,] # rows 1 to 5
 nba[1:5,1:5] # rows 1 to 5, columns 1 to 5
+nba[1:5,] # rows 1 to 5, all columns
+View(nba[1:5,])
 
-## can access specific columns with the "extract" operator (type ?Extract)
+## can access specific columns with the ?Extract operator
+names(nba)
 nba$pid[1:5]
-nba[1:5,'player'] # rows 1 to 5, "player" column
+nba[1:5,'pid'] # rows 1 to 5, "player" column
 
 ## can subset data according to certain conditions
-lbj <- nba[nba$player == "LeBron James",] # box scores for LeBron James
+lbj <- nba[nba$player == 'LeBron James',] # subset of box scores for LeBron James
 basic <- c('player','min','pts','reb')
 lbj[1:5,basic]
 
@@ -75,190 +99,161 @@ length(unique(v1)) # the "length" function returns the length of the vector
 length(unique(nba$pid))
 
 ## exercises:
-## 1) create a vector containing the even numbers between 1 and 50
-## 2) create a subset of the data that contains entries for all point guards (PG)
-## 3) what are the dimensions of the data.frame from 2)?
-## 4) how many total games were played in the season? (note: some questions you don't need data)
+## 1) examine the nba dataset with ?View. What does it contain?
+## 2) what is the difference between the 'pid' and 'player' columns?
+## 3) what set of variables is an identifier for the dataset (i.e. there are 31,351 unique combinations)? in other words, what is the level of the dataset?
+## 4) create a subset of the data that contains entries for all point guards (PG). what are its dimensions?
+## 5) how many total games were played in the '12-'13 season? Is it what you would expect (hint: 30 teams play 82 games each)?
+## 6) what is the average number of minutes played? points scored? (try ?mean)
 
 ##
-## Exploring data cont.
+## IV. SCORING STATISTICS
 ## 
 
 ## how many points did LeBron James score?
-sum(lbj$pts) # introducing the missing value indicator
-lbj[lbj$game_id=='400278818',basic] # LeBron did not play in this game, missing values are distinguished
-sum(lbj$pts, na.rm=T) # need to specify an option for the "sum" function
+sum(lbj$pts)
+sum(nba$pts[nba$player=='LeBron James'])
 # check against http://espn.go.com/nba/player/stats/_/id/1966/lebron-james
 
-## data says 2055, ESPN says 2036 - what gives?
-nba[nba$game_id=='400436572',][1:5,basic] # this is a pretty crazy lineup... because it's the all-star game
-nba <- subset(nba, nba$game_id!='400436572') # remove this game
-lbj <- nba[nba$player == "LeBron James",] # recreate lbj
-sum(lbj$pts, na.rm=T) # that's better
+## who scored most points per game (ppg)?
+nba <- nba[nba$min > 0, ] # remove games in which players were inactive
 
-## who scored most points per game?
-nba$gp <- as.integer(!is.na(nba$min)) # boolean values can be converted to integers
-ppg <- aggregate(nba[,c('pts','gp')], list(pid=nba$pid), sum, na.rm=T)
-ppg$ppg <- with(ppg, pts/gp) # the "with" function is a shortcut
+pid <- 9 # want to repeatedly do this
+tmp <- nba[nba$pid==pid,]
+mean(tmp$pts)
+## mini exercises:
+## 1) how would you check that pid 9 corresponds to Ray Allen?
+## 2) how would you check the player name for any given pid?
+## 3) Write a for loop to calculate ppg for every player (use ?Control, see accompanying slides for additional help)
 
-order_ppg <- order(ppg$ppg, decreasing=T)
-order_ppg[1:5] # the "order" function returns a sorted vector of indices
+## calculate ppg using R's built in functions
+ppg <- aggregate(x = nba$pts,
+                 by = list(pid = nba$pid),
+                 FUN = mean)
+max(ppg$x)
 
-plyrs <- unique(nba[,c('pid','player')]) # bring back player names
-ppg <- merge(ppg, plyrs, by='pid') # the "merge" function joins two dataframes
-ppg <- ppg[order_ppg,]
+## can also use Hadley Wickham's very popular plyr package
+# install.packages('plyr')
+require(plyr)
+ppg2 <- ddply(nba, .(pid), summarize, ppg = mean(pts))
+ppg2 <- ddply(nba, .(pid, player, summarize, ppg = mean(pts)) # if we wanted player names too
+
+## player with most ppg
+idx <- which.max(ppg$x)
+pid <- ppg$pid[idx]
+pid
+nba$player[nba$pid==pid][1]
+
+## top 5 scorers
+plyrs <- unique(nba[,c('pid','player')]) # haha
+plyrs[1:5,]
+ppg <- merge(ppg, plyrs, by='pid') # or we could just use ppg2...
 ppg[1:5,]
 
+order_ppg <- order(ppg$x, decreasing=T)
+order_ppg[1:5] # the "order" function returns a sorted vector of indices
+
+ppg <- ppg[order_ppg,] # pass in the vector of indices
+ppg[1:5,]
 ## check that this matches ESPN http://espn.go.com/nba/statistics/_/year/2013
 
-
-# Calculate rebounds, assists, and blocks per game (reb, ast, blk). Who are the top players in each category?
-nba$gp <- as.integer(!is.na(nba$min)) # boolean values can be converted to integers
-pg <- aggregate(nba[,c('pts','reb','ast','blk','gp')], list(pid=nba$pid), sum, na.rm=T)
-pg$ppg <- with(pg, pts/gp) # the "with" function is a shortcut
-pg$rpg <- with(pg, reb/gp) # the "with" function is a shortcut
-pg$apg <- with(pg, ast/gp) # the "with" function is a shortcut
-pg$bpg <- with(pg, blk/gp) # the "with" function is a shortcut
-
-order_ppg <- order(pg$ppg, decreasing=T)
-order_rpg <- order(pg$rpg, decreasing=T)
-order_apg <- order(pg$apg, decreasing=T)
-order_bpg <- order(pg$bpg, decreasing=T)
-
-plyrs <- unique(nba[,c('pid','player')]) # bring back player names
-pg <- merge(pg, plyrs, by='pid') # the "merge" function joins two dataframes
-pg[order_ppg[1:5],]
-pg[order_rpg[1:5],]
-pg[order_apg[1:5],]
-pg[order_bpg[1:5],]
-
-# Which team scored the most points per game?
-tpg <- aggregate(nba[,c('pts','gp')], list(team=nba$team), sum, na.rm=T)
-tpg[order(tpg$pts),]
-
-
-
-
-
-
-
-
 ## exercises:
-## 1) check that your favorite player's season stats match his ESPN page
-## 2) which player scored the most total points? (try ?max)
-## 3) which player gathered the most rebounds per game?
-## 4) which team scored the most points per game?
+## 1) Calculate rebounds, assists, and blocks per game (reb, ast, blk) for each player. Who are the top players in each category?
+## 2) (Challenge) Calculate all per-game stats with a single command
+## 3) Which team scored the most points per game?
 
 ##
-## Visualizing data
+## V. VISUALIZING DATA
 ##
 
 ## what is the distribution of players in terms of points per game?
-hist(ppg$ppg) # the "hist" function computes frequencies e.g. # of players who scored 0-5 ppg
-hist(ppg$ppg, breaks=seq(from=0,to=30,by=2.5))
-
-## bar chart of top players
-par(las=2)
-with(per_game[order_ppg[1:10],], barplot(pts, horiz=T, names.arg=player, xlim=c(0,30)))
+hist(ppg$x)
+hist(ppg$x, breaks=seq(from=0,to=30,by=2.5))
 
 ## how does LeBron's ppg look over the course of the season?
 lbj <- subset(nba, player=='LeBron James')
-lbj_pts <- replace(lbj$pts, is.na(lbj$pts), 0)
-lbj_ppg <- cumsum(lbj_pts) / cumsum(lbj$gp) # this is a "rolling" calculation
+lbj_ppg <- cumsum(lbj$pts) / 1:length(lbj$pts) # this is a "rolling" calculation
 plot(lbj_ppg, type='l', ylab='PPG', xlab='Game #')
 
 ## how does it compare to Kevin Durant's?
 kd <- subset(nba, player=='Kevin Durant')
-kd_pts <- replace(kd$pts, is.na(kd$pts), 0)
-kd_ppg <- cumsum(kd_pts) / cumsum(kd$gp) # this is a "rolling" calculation
+kd_ppg <- cumsum(kd$pts) / 1:length(kd$pts)
 plot(lbj_ppg, type='l', ylab='PPG', xlab='Game #', ylim=c(20,30))
 lines(kd_ppg, type='l', col='red') # add lines to an existing plot
 
-## what if we wanted to compare any two players?
-square <- function(x) { return(x^2) } # minor segue on defining functions (see ?function)
+## minor segue: defining functions
+square <- function(x) { return(x^2) }
 square(2)
 square(1:5)
 
-## note: we are sidestepping the issue that not all players were active in every game
-##       e.g. Carmelo Anthony has only 74 entries
-nba2 <- nba[order(nba$pid, nba$game_id),] # sort our dataframe by player and game
-nba2$pts <- replace(nba2$pts, is.na(nba2$pts), 0)
-ppg_roll <- tapply(nba2$pts, nba2$pid, cumsum) # "tapply" is a general version of aggregate and returns a list
-gp_roll <- tapply(nba2$gp, nba2$pid, cumsum)
+sum2 <- function(x,y) { return(x+y) }
+sum2(1,2)
 
-plot(ppg_roll[['1966']] / gp_roll[['1966']], type='l', ylim=c(20,35)) # LeBron James
-lines(ppg_roll[['3202']] / gp_roll[['3202']], type='l', col='red') # Kevin Durant
-lines(ppg_roll[['110']] / gp_roll[['110']], type='l', col='blue') # Kobe Bryant
+## what if we wanted to compare any two players?
+roll_calc <- function(x) { # define a custom function
+  ppg <- cumsum(x$pts) / 1:length(x$pts)
+  return(ppg)
+}
+kd_ppg2 <- roll_calc(subset(nba, pid==3202))
+
+ppg_roll <- dlply(nba, .(pid), roll_calc) # return a list of vectors after applying roll_calc
+ppg_roll[[1]] # access by index
+ppg_roll[['9']] # access by key
+names(ppg_roll)
+
+plot(ppg_roll[['1966']], type='l', ylim=c(20,30)) # LeBron James
+lines(ppg_roll[['3202']], type='l', col='red') # Kevin Durant
+lines(ppg_roll[['110']], type='l', col='blue') # Kobe Bryant
 
 ## what is the relationship between various statistics?
 ## e.g. do high scorers collect more rebounds?
-stats <- c('min','reb','ast','stl','blk','tos','pts','gp')
-season <- aggregate(nba[,stats], list(pid=nba$pid), sum, na.rm=T)
-season <- merge(season, plyrs, by='pid')
-per_game <- cbind(season[,c('pid','player')], season[,2:8]/season$gp)
+stats <- c('min','reb','ast','stl','blk','tos','pts')
+pg <- aggregate(nba[,stats], list(pid=nba$pid), mean)
+pg <- merge(pg, plyrs, by='pid')
+pg[1:5,]
 
-with(per_game, plot(y=pts, x=reb)) # a scatter plot of ppg versus rpg
-with(per_game, plot(pts~tos)) # a scatter plot of ppg versus tpg
-with(per_game, cor(pts, tos, use='complete')) # a measure of the relationship's strength
-# seems to be a positive relationship between points and rebounds
+plot(y=pg$pts, x=pg$reb) # scatter plot
+cor(pg$pts, pg$reb) # correlation
+plot(pg[,stats]) # series of scatter plots
 
 ## exercises:
 ## 1: plot a histogram of rebounds per game by player. what does it tell you?
-hist(pg$rpg, breaks = 20)
-
-
-
-
-
-## 2: think of other ways to describe the distribution of ppg and rpg (e.g. try ?sd, ?mean, ?quantile)
-## 3: try scatter plots of different statistics. what is a drawback of per game statistics? (hint: try minutes played)
-## 4 (challenge): fix the active player issue above so that you can trace
-##			their statistics through all 82 games of the season
-##			(hint: you will need game dates from "box_ov_2012to2013.csv")
+## 2: what is an issue with our rolling calculation (hint: how many games has each player played)? How might you address it?
+## 3: (Challenge) Fix the issue (ask me for game dates matched to game_ids, as game_ids are not exactly ordered by time)
+## 4: it looks like there is a positive relationship between points and rebounds per game. does this mean better scorers are better rebounders? why or why not?
+## 5: try scatter plots of different statistics. what is a drawback of per game statistics? (hint: try comparing to minutes played)
+## 6: calculate points and rebounds per 48 minutes. what does this relationship tell you?
 
 ##
-## Linear regression
+## VI. LINEAR REGRESSION
 ##
 
 ## per game statistics are influenced by minutes played
-## per minute (typically per 48 minute) statistics are better for certain comparisons
-with(per_game, plot(pts~min))
-with(per_game, plot(reb~min))
-per_48min <- cbind(season[,c('pid','player')], season[,3:8]/season$min*48)
+with(pg, plot(pts~min))
+with(pg, plot(reb~min))
 
-per_48min2 <- per_48min[order(per_48min$pts, decreasing=T),]
-per_48min2[1:5,] # Henry Sims is first??
-season[season$pid==6647,] # he played only 5 minutes... we have a sample size problem
-per_48min$qualify <- with(season, gp>=70 | pts>=1400) # try espn's criteria
-
-p48m_q <- per_48min[per_48min$qualify,]
-with(p48m_q, plot(pts~reb))
-with(p48m_q, cor(pts,reb)) # slightly negative relationship
-
-## using linear regression (i.e. fitting a line through the scatter plot)
-m1 <- lm(pts~reb, data=p48m_q)
+## investigate the relationship between scoring and minutes using linear regression
+m1 <- lm(pts~min, data=pg)
 summary(m1) # (Intercept) is the intercept, reb is the slope of the line
-with(p48m_q, plot(pts~reb))
+with(pg, plot(pts~min))
 abline(m1, col='red')
 
-## multiple controls using multivariate regression
-m2 <- lm(pts~reb+min, data=per_game)
-summary(m2) # typical interpretation: for each additional mpg, the average player scores .52 additional ppg
+## what does the scoring/rebound relationship look like after accounting for minutes?
+m2 <- lm(pts~reb+min, data=pg)
+summary(m2) # insignificant relationship
 
-m3 <- lm(pts~reb+min+tos, data=per_game)
-summary(m3) # accounting for TOs, there is essentially no relation between ppg and rpg
+m3 <- lm(pts~reb+min+tos, data=pg)
+summary(m3) # relationship is nearly zero after accounting for more variables
 
 ## regression models can be used as predictive models
 fake_player <- as.data.frame(list(reb=8.0,min=20.0,tos=1.5))
 predict(m3, newdata=fake_player) # the model predicts he would score 8.6ppg
 
 ## exercises:
-## 1: In simple linear regression, the slope is given by cov(x,y)/var(x)
-##    The (pearson) correlation is given by cor(x,y)=cov(x,y)/(sd(x)*sd(y))
-##    Calculate the slope for m2 by hand using ?cor and ?sd functions. What does this tell you about correlation?
-## 2: Create a regression model for predicting a player's scoring (ppg) from previous year's scoring
-##    a - Read in "box_2011to2012.csv" and calculate ppg for each player
-##    b - Plot ppg_12to13 against ppg_11to12
-##    c - Fit a regression model
-##    d - Qualitatively test how well the model predicts 2013-2014 stats from 2012-2013 (use ESPN player pages e.g. http://espn.go.com/nba/player/_/id/110)
-##    e - Consider including other variables e.g. minutes, team, etc.
+## 1: Rank the top scorers by points per 48 minutes
+##    a - How does this ranking compare to the points per game ranking?
+##    b - What additional considerations must you make to get at scoring ability?
+## 2: (Challenge) Create a regression model for predicting a player's scoring (ppg) from previous year's scoring
+##    a - Read in and prepare data from the '11-'12 season
+##    b - Fit a model that predicts '12-'13 ppg from '11-'12 statistics
+##    c - Evaluate the model's performance on '13-'14 (so far)

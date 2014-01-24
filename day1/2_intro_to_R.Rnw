@@ -55,11 +55,12 @@
 \begin{block}{Let's start by reading in some real-life data}
 <<>>=
   setwd('~/GitHub/data-mining-intersession/day1')
-  nba <- read.csv('box_2012to2013.csv', stringsAsFactors=F)
+  nba <- read.csv('box_2012to2013.csv'
+                  , stringsAsFactors=F)
   class(nba)
 @
 \end{block}
-In R terminology, data typically comes in the form of a \textit{data.frame} (try ?data.frame). Data frames are essentially matrices that can store non-numeric values, and very similar to spreadsheets.
+In R terminology, data typically comes in the form of a \textit{data.frame} (try ?data.frame). Data frames are essentially matrices that can store non-numeric values, and are very similar to spreadsheets.
 \end{frame}
 
 \begin{frame}[fragile]{Data frames cont.}
@@ -157,7 +158,8 @@ TRUE & FALSE
 \begin{enumerate}
   \item Create a vector of the even numbers between 1 and 50
   \item What happens if you use ?sum on a vector of boolean values?
-  \item What would happen if you typed nba[,]?
+  \item What would happen if you ran nba[,]?
+  \item Explore R's built-in constants by reading the documentation (type ?Constants)
 \end{enumerate}
 \end{frame}
 
@@ -214,9 +216,11 @@ The ?unique function returns the unique values that appear in the inputted vecto
 
 \begin{frame}[fragile]{Exercises!}
 \begin{enumerate}
-  \item Familiarize yourself with the nba dataset. What does it contain? (Try ?View to for a spreadsheet-like view)  
+  \item Examine the nba dataset with ?View. What does it contain?
+  \item What is the difference between the 'pid' and 'player' columns (besides that one is a number)?
+  \item What set of variables is an identifier for the dataset (i.e. there are 31,351 unique combinations)? In other words, what is the level of the dataset?
   \item Create a subset of the data that contains entries for all point guards (PG). What are its dimensions?
-  \item How many total games were played in the '12-'13 season? (note: some questions don't require data)
+  \item How many total games were played in the '12-'13 season? Is it what you would expect (hint: 30 teams play 82 games each)?
   \item What is the average number of minutes played? Points scored? (Try ?mean)  
 \end{enumerate}
 \end{frame}
@@ -250,7 +254,21 @@ Check this against ESPN's records \url{http://espn.go.com/nba/player/stats/_/id/
   mean(tmp$pts)
 @
 \end{block}
-Player 9 is Ray Allen. How would you check this?
+Player 9 corresponds to Ray Allen.
+\end{frame}
+
+\begin{frame}[fragile]{Mini-Exercises!}
+\begin{enumerate}
+  \item How would you check that pid 9 corresponds to Ray Allen? 
+  \item How would you check the player name for any given pid?
+  \item (Optional) Write a "for loop" to calculate points per game for every player
+  \begin{enumerate}
+    \item Review the documentation of the "for" command (?Control)
+    \item Create a vector of the unique players that appeared
+    \item Looping over this vector, repeatedly calculate the mean
+    \item (Challenge) You could store the calculated means by initializing an empty vector with ?rep e.g. ppg <- rep(NA, n) where n is the number of entries
+  \end{enumerate}
+\end{enumerate}
 \end{frame}
 
 \begin{frame}[fragile]{Points per game (PPG) cont.}
@@ -263,6 +281,19 @@ Player 9 is Ray Allen. How would you check this?
 @
 \end{block}
 What's going on here? The vector nba\$pts is first split into subsets according to nba\$pid. Then the ?mean function is being applied to each subset. This idea is known as split-apply-combine and is similar to map-reduce (which is a big buzzword in big data).
+\end{frame}
+
+\begin{frame}[fragile]{Points per game (PPG) cont.}
+\begin{block}{We can also use Hadley Wickham's very popular plyr package to do the same thing.}
+<<>>=
+  # install.packages('plyr')
+  require(plyr)
+  ppg2 <- ddply(nba, .(pid), summarize, 
+                ppg = mean(pts))
+  ppg2[1,]
+@
+\end{block}
+The structure of this command is exactly the same as with aggregate. See the documentation (?ddply and ?plyr).
 \end{frame}
 
 \begin{frame}[fragile]{Points per game (PPG) cont.}
@@ -310,7 +341,8 @@ Think about how you would do this by hand. For each pid in \emph{ppg}, you'd loo
 \begin{frame}{Exercises}
 \begin{enumerate}
   \item Calculate rebounds, assists, and blocks per game (reb, ast, blk). Who are the top players in each category?
-  \item Which team scored the most points per game?
+  \item (Challenge) Calculate all per-game stats with a single command
+  \item Which team scored the most points per game?  
 \end{enumerate}
 \end{frame}
 
@@ -354,6 +386,57 @@ Time series are very common in applications within finance.
 Note that we're sidestepping the fact that they might not have played the same number of games.
 \end{frame}
 
+\begin{frame}[fragile]{PPG over the season cont.}
+\begin{block}{What if we wanted to compare any given players? Minor segue: we will need to know how to define functions. Functions are defined with the 'function' keyword and can be assigned to names.}
+<<>>==
+  square <- function(x) { return(x^2) } # minor segue on defining functions
+  square(2)
+  square(1:5)
+  sum2 <- function(x, y) { return(x+y) }
+  sum2(1,2)
+@
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{PPG over the season cont.}
+\begin{block}{Let's define a custom function that will allow us to make rolling calculations for any given player.}
+<<>>==
+  roll_calc <- function(x) {
+    ppg <- cumsum(x$pts) / 1:length(x$pts)
+    return(ppg)
+  }
+  kd_ppg2 <- roll_calc(subset(nba, pid==3202))
+  kd_ppg2[1:5]
+@
+\end{block}
+The roll\_calc function takes in a subset of nba and returns a vector.
+\end{frame}
+
+\begin{frame}[fragile]{PPG over the season cont.}
+\begin{block}{Now let's use the dlply function to apply roll\_calc for each player. See documentation in ?dlply. This returns a list of vectors.}
+<<>>==
+  ppg_roll <- dlply(nba, .(pid), roll_calc)
+  ppg_roll[[1]][1:5] # access by index
+  ppg_roll[['9']][1:5] # access by key
+@
+\end{block}
+Experiment with ppg\_roll to better understand how lists work. Also see ?list. Lists in R are very similar to dictionaries in Python.
+\end{frame}
+
+\begin{frame}[fragile]{PPG over the season cont.}
+\begin{block}{Compare LeBron to Durant to Kobe:}
+\setkeys{Gin}{width=0.35\textwidth}
+<<fig=T>>==
+  plot(ppg_roll[['1966']], type='l', ylim=c(20,32))
+    # LeBron
+  lines(ppg_roll[['3202']], type='l', col='red')
+    # Durant
+  lines(ppg_roll[['110']], type='l', col='blue')
+    # Kobe
+@
+\end{block}
+\end{frame}
+
 \begin{frame}[fragile]{Relationship between scoring and rebounding}
 \begin{block}{Let's switch gears a bit. We'll now consider the relationship between scoring and rebounding. First let's get all these stats in one place.}
 \setkeys{Gin}{width=0.35\textwidth}
@@ -378,8 +461,11 @@ Note that we're sidestepping the fact that they might not have played the same n
 \begin{frame}{Exercises}
 \begin{enumerate}
   \item Plot a histogram of rebounds per game. What does it tell you?
-  \item How else can you describe distributions? (Try ?mean, ?sd, ?quantile).
-  \item Plot the relationship between various stats. What is a drawback of per game stats? (Hint: Try against minutes played)
+  \item What is an issue with our rolling calculation? (Hint: How many games has each player played?)
+  \item (Challenge) Fix the issue above. (Hint: You may need to ask me for a supplementary dataset, as game\_ids are not exactly ordered by time)
+  \item There is a positive relationship between points and rebounds per game. Does this mean better scorers are also better rebounders? Why or why not?
+  \item What is a drawback of per-game statistics? (Hint: Try scatter plots against minutes played)
+  \item Calculate points and rebounds per 48 minutes. What does this relationship tell you?
 \end{enumerate}
 \end{frame}
 
@@ -390,7 +476,7 @@ Note that we're sidestepping the fact that they might not have played the same n
 %%%
 
 \begin{frame}[fragile]{Scoring and minutes}
-\begin{block}{The point of Exercise 3 was that all of the per game statistics are highly dependent (and nearly linearly) on minutes played.}
+\begin{block}{Let's further explore the relationship between scoring and rebounding. The point of Exercise 5 was that per-game statistics are highly dependent on minutes played.}
 \setkeys{Gin}{width=0.5\textwidth}
 <<fig=T>>==
   plot(pg$pts~pg$min)
@@ -401,7 +487,7 @@ Note that we're sidestepping the fact that they might not have played the same n
 \begin{frame}[fragile]{Scoring and minutes cont.}
 \begin{block}{We can quantify the relationship between scoring and minutes using linear regression, implemented with the ?lm function (for linear model).}
 <<>>==
-  m1 <- with(pg, lm(pts~min))
+  m1 <- lm(pts~min, data=pg)
   m1
 @
 \end{block}
@@ -409,7 +495,7 @@ Try summary(m1) for an assessment of how well the model fits the data. This is t
 \end{frame}
 
 \begin{frame}[fragile]{Scoring and minutes cont.}
-\begin{block}{The idea of linear regression is basically to fit a line through the scatter plot of Y on X.}
+\begin{block}{The idea of linear regression is essentially to fit a line through the scatter plot of Y on X.}
 \setkeys{Gin}{width=0.5\textwidth}
 <<fig=T>>==
   plot(pg$pts~pg$min)
@@ -427,8 +513,18 @@ Try summary(m1) for an assessment of how well the model fits the data. This is t
 Since it's a line, the model is defined by two parameters - slope and intercept. The slope can be interpreted as follows: for the average player, each additional minute per game results in an additional 0.5 points per game.
 \end{frame}
 
+\begin{frame}[fragile]{Scoring and rebounding}
+\begin{block}{What does the scoring/rebounding relationship look like after we account for minutes played?}
+<<>>==
+  m2 <- lm(pts~reb+min, data=pg)
+  summary(m2)
+@
+\end{block}
+The coefficient on rebounding is statistically indistinguishable from zero.
+\end{frame}
+
 \begin{frame}[fragile]{Scoring and minutes cont.}
-\begin{block}{Linear regression supplies us with a method for making predictions.}
+\begin{block}{Linear regression supplies us with a method for making predictions. See ?predict.lm}
 <<>>==
   fake_player <- list(min=20.0)
   predict(m1, newdata=fake_player)
@@ -439,10 +535,17 @@ In particular, $\hat{pts} = 0.52*min - 2.60$ where $\hat{pts}$ is our prediction
 
 \begin{frame}{Exercises}
 \begin{enumerate}
-  \item Extend the regression model by adding additional variables. (Hint: You will need formulas of the form lm(y~x1+x2+...))
-  \item (challenge) Rank top scorers by points per 48 minute, as opposed to points per game. What additional considerations must you make?
-  \item (challenge) Compare points per 48 minute to rebounds per 48 minute. Verify that the positive relationship between ppg and rpg is due almost entirely to minutes played.
-  \item (challenge) Create a regression model for predicting  player's ppg from last year's ppg. Data from the '11-'12 season is also available on GitHub. How well does this model work for '13-'14?
+  \item Rank the top scorers by points per 48 minutes
+  \begin{enumerate}
+    \item How does this ranking compare to the points per game ranking?
+    \item What additional considerations must you make to get at scoring ability?
+  \end{enumerate}
+  \item (Challenge) Create a regression model for predicting a player's scoring in terms of ppg
+  \begin{enumerate}
+    \item Read in and prepare data from the '11-'12 season
+    \item Fit a model that predicts '12-'13 ppg from '11-'12 statistics
+    \item Evaluate the model's performance on '13-'14 (so far)
+  \end{enumerate}
 \end{enumerate}
 \end{frame}
 
